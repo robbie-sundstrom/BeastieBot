@@ -1,6 +1,7 @@
 from TwitterSearch import *
+from countsyl import count_syllables
 
-def find_tweets(sourceword,limit):
+def find_tweets(sourceword, limit):
     """
     Generates a list of the limit number of tweets ending in the sourceword.
     """
@@ -11,8 +12,8 @@ def find_tweets(sourceword,limit):
 
     # create TwitterSearch object
     ts = TwitterSearch(
-        ### PASTE KEYS HERE ###
-    )
+            # INSERT KEYS HERE #
+        )
 
     counter = 0
     tweetlist = []
@@ -22,9 +23,14 @@ def find_tweets(sourceword,limit):
             break
 
         thistweet = tweet['text']
-        if '@' not in thistweet and thistweet[-(len(sourceword)):] == sourceword:
+        sylcount = count_syllables(thistweet)
+
+        if sylcount < 9 and '@' not in thistweet and thistweet[-(len(sourceword)):] == sourceword:
             tweetlist.append(thistweet)
+            return thistweet
             counter += 1
+
+
     return tweetlist
 
-print find_tweets('flame.',4)
+# print find_tweets('cheese.',1)
