@@ -1,5 +1,5 @@
 from Tkinter import *
-from subprocess_test import *
+from BeastieAudio import *
 
 class BeastieInterface:
     def __init__(self, master):
@@ -53,10 +53,7 @@ class BeastieInterface:
 
     def play(self):
     	aplay()
-    
-    def set_theme(self):
-    	return self.v.get()
-    
+        
     def fetch(self):
         print self.v.get()
 
