@@ -1,11 +1,13 @@
 """
 THE FINAL CODE
-
-
 """
 from TwitterSearch import *
 from countsyl import count_syllables
-import time, urllib2, json, random
+import time, urllib2, json, random, sys
+
+apinum = 0
+apis_done = 0
+#### PUT apidict HERE ####
 
 def find_rhymes(sourceword):
 	url = "http://rhymebrain.com/talk?function=getRhymes&word=" + sourceword
@@ -29,49 +31,59 @@ def find_rhymes(sourceword):
 def find_tweets(sourceword, limit):
     """
     Generates a list of the limit number of tweets ending in the sourceword.
+
+    limit: maximum number of seconds to search for
     """
+    global apinum, apis_done
     tso = TwitterSearchOrder() # create a TwitterSearchOrder object
     tso.set_keywords([sourceword]) # word to search for
     tso.set_language('en') # English tweets only
     tso.set_include_entities(False) # don't give us entity information
 
-    # PUT KEY FUNCTION HERE
+    ts = apidict[apinum]
 
-    tweetlist = []
     start = time.time()
     elapsed = 0
 
-    for tweet in ts.search_tweets_iterable(tso):
-        if elapsed >=  limit:
-            break
+    try:
+        for tweet in ts.search_tweets_iterable(tso):
+            if elapsed >= limit:
+                break
 
-        thistweet = tweet['text']
-        sylcount = count_syllables(thistweet)
+            thistweet = tweet['text']
+            sylcount = count_syllables(thistweet)
 
-        if sylcount <= 10 and sylcount >= 5 and '@' not in thistweet and thistweet[-(len(sourceword)):] == sourceword:
-            tweetlist.append(thistweet)
-            return thistweet
-        elapsed = time.time() - start
+            if sylcount <= 10 and sylcount >= 5 and '@' not in thistweet and thistweet[-(len(sourceword)):] == sourceword:
+                return thistweet
+            elapsed = time.time() - start
+    except TwitterSearchException:
+        apinum = (apinum + 1) % 3
+        apis_done += 1
+        if apis_done >= 3:  # if we exhausted all 3 api keys
+            print 'All api keys have reach their rate limit. Please try again in 15 minutes.'
+            sys.exit(0)
+        return find_tweets(sourceword, limit)
 
     return ""
 
 def beastie_it_up(sourceword, limit):
-	rhymelist = find_rhymes(sourceword)
-	print rhymelist
-	start = time.time()
-	elapsed = 0
-	
-	i = 0
-	while i < limit:
-		thisword = rhymelist[i]
-		print 'finding rhymes for:',thisword
+    rhymelist = find_rhymes(sourceword)
+    print rhymelist
+    start = time.time()
+    elapsed = 0
 
-		thistweet = find_tweets(thisword, 5)
-		if thistweet == "":
-			# make sure we still get 4 lines if it doesn't find a tweet
-			limit += 1
-		else:
-			print thistweet
-		i += 1
+    i = 0
+    while i < limit and i < len(rhymelist):
+    	thisword = rhymelist[i]
+        thistweet = find_tweets(thisword, 2)
+    	if thistweet == "":
+    		# make sure we still get 4 lines if it doesn't find a tweet
+    		limit += 1
+    	else:
+            try:
+                print thistweet
+            except UnicodeEncodeError:
+                limit += 12 # if there's an emoticon, skip this one
+    	i += 1
 
-beastie_it_up('store', 4)
+beastie_it_up('free', 12)
