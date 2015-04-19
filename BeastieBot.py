@@ -83,7 +83,7 @@ def beastie_it_up(sourceword, limit):
             try:
                 print thistweet
             except UnicodeEncodeError:
-                limit += 12 # if there's an emoticon, skip this one
+                limit += 1 # if there's an emoticon, skip this one
     	i += 1
 
 beastie_it_up('free', 12)
