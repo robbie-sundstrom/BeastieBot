@@ -53,13 +53,16 @@ def find_tweets(sourceword, limit):
             thistweet = tweet['text']
             sylcount = count_syllables(thistweet)
 
-            if sylcount <= 10 and sylcount >= 5 and '@' not in thistweet and thistweet[-(len(sourceword)):] == sourceword:
-                return thistweet
+            if thistweet[-(len(sourceword)):] == sourceword\
+            or thistweet[-(len(sourceword)+1):] == sourceword+'.':
+                if sylcount <= 10 and sylcount >= 5\
+                and '@' not in thistweet and 'http' not in thistweet:
+                    return thistweet
             elapsed = time.time() - start
     except TwitterSearchException:
         apinum = (apinum + 1) % 3
         apis_done += 1
-        if apis_done >= 3:  # if we exhausted all 3 api keys
+        if apis_done >= 3:  # if we exhausted all api keys
             print 'All api keys have reach their rate limit. Please try again in 15 minutes.'
             sys.exit(0)
         return find_tweets(sourceword, limit)
@@ -86,4 +89,4 @@ def beastie_it_up(sourceword, limit):
                 limit += 1 # if there's an emoticon, skip this one
     	i += 1
 
-beastie_it_up('free', 12)
+beastie_it_up('pole', 16)
