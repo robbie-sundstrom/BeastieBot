@@ -1,5 +1,9 @@
 """
 THE FINAL CODE
+
+Created Apr 5, 2015
+
+@authors Mackenzie Frackleton, Emily Mamula, Robert Siegel, Bill Wong
 """
 from TwitterSearch import *
 from countsyl import count_syllables
@@ -10,29 +14,45 @@ apis_done = 0
 #### PUT apidict HERE ####
 
 def find_rhymes(sourceword):
-	url = "http://rhymebrain.com/talk?function=getRhymes&word=" + sourceword
-	f = urllib2.urlopen(url)
-	rawrhymes = f.read()
-
-	rhymes_dicts_list = json.loads(rawrhymes)
-
-	perfect_rhymes_dicts_list = []
-
-	for diction in rhymes_dicts_list:
-		if diction['score'] >= 300:
-			perfect_rhymes_dicts_list.append(diction)
-	sorted_list = sorted(perfect_rhymes_dicts_list, key=lambda k: k['freq'], reverse=True)
-
-	wordlist = []
-	for diction in sorted_list:
-		wordlist.append(str(diction['word']))
-	return wordlist
-
-def find_tweet(sourceword, limit):
     """
-    Generates a list of the limit number of tweets ending in the sourceword.
+    Generates a list of perfect rhymes of the sourceword, sorted by
+    frequency in the English language.
 
-    limit: maximum number of seconds to search for
+    sourceword: the word to find rhymes of
+    returns: A list of perfect rhymes
+    """
+    url = "http://rhymebrain.com/talk?function=getRhymes&word=" + sourceword
+    f = urllib2.urlopen(url)
+    rawrhymes = f.read()
+
+    rhymes_dicts_list = json.loads(rawrhymes)
+
+    perfect_rhymes_dicts_list = []
+
+    for diction in rhymes_dicts_list:
+    	if diction['score'] >= 300:
+    		perfect_rhymes_dicts_list.append(diction)
+    sorted_list = sorted(perfect_rhymes_dicts_list, key=lambda k: k['freq'],
+                         reverse=True)
+
+    wordlist = []
+    for diction in sorted_list:
+    	wordlist.append(str(diction['word']))
+    return wordlist
+
+def find_tweet(sourceword, timelimit):
+    """
+    Searches Twitter for a tweet ending in the sourceword. Only
+    searches for tweets between 5 and 10 syllables long. Ignores
+    tweets with '@' symbols or links to avoid retweets and unnecessary
+    syllables.
+
+    If no tweet is found before the timelimit, returns a blank string.
+
+    sourceword: word that the tweets should end with
+    timelimit: maximum number of seconds to search for
+    returns: a string of the tweet, or an empty string if no tweet is
+             found
     """
     global apinum, apis_done
     tso = TwitterSearchOrder() # create a TwitterSearchOrder object
@@ -47,46 +67,58 @@ def find_tweet(sourceword, limit):
 
     try:
         for tweet in ts.search_tweets_iterable(tso):
-            if elapsed >= limit:
+            if elapsed >= timelimit:
                 break
 
             thistweet = tweet['text']
             sylcount = count_syllables(thistweet)
 
-            if thistweet[-(len(sourceword)):] == sourceword\
-            or thistweet[-(len(sourceword)+1):] == sourceword+'.':
-                if sylcount <= 10 and sylcount >= 5\
-                and '@' not in thistweet and 'http' not in thistweet:
+            # check for ending word
+            if thistweet[-(len(sourceword)):] == sourceword or \
+               thistweet[-(len(sourceword)+1):] == sourceword+'.':
+                # check syllables, '@' symbols, and links
+                if sylcount <= 10 and sylcount >= 5 and \
+                   '@' not in thistweet and 'http' not in thistweet:
                     return thistweet
             elapsed = time.time() - start
     except TwitterSearchException:
         apinum = (apinum + 1) % 3
         apis_done += 1
         if apis_done >= 3:  # if we exhausted all api keys
-            print 'All api keys have reach their rate limit. Please try again in 15 minutes.'
+            print ('All api keys have reach their rate limit. Please '
+                   'try again in 15 minutes.')
             sys.exit(0)
-        return find_tweet(sourceword, limit)
+        return find_tweet(sourceword, timelimit)
 
     return ""
 
-def beastie_it_up(sourceword, limit):
+def beastie_it_up(sourceword, linelimit):
+    """
+    Prints tweets that end in a words that rhyme with the sourceword.
+    Prints each tweet as it finds it. Stops after linelimit tweets, or
+    after there are no more rhymes.
+
+    sourceword: the word to rhyme with
+    linelimit: the maximum number of lines to print
+    returns: None
+    """
     rhymelist = find_rhymes(sourceword)
     print rhymelist
     start = time.time()
     elapsed = 0
 
     i = 0
-    while i < limit and i < len(rhymelist):
+    while i < linelimit and i < len(rhymelist):
     	thisword = rhymelist[i]
         thistweet = find_tweet(thisword, 2)
     	if thistweet == "":    # if it doesn't find a tweet
     		# make sure we still get the same number of lines
-    		limit += 1
+    		linelimit += 1
     	else:
             try:
                 print thistweet
             except UnicodeEncodeError:
-                limit += 1 # if there's an emoticon, skip this one
+                linelimit += 1 # if there's an emoticon, skip this one
     	i += 1
 
-beastie_it_up('pole', 16)
+beastie_it_up('pole', 12)
