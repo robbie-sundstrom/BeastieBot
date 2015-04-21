@@ -28,7 +28,7 @@ def find_rhymes(sourceword):
 		wordlist.append(str(diction['word']))
 	return wordlist
 
-def find_tweets(sourceword, limit):
+def find_tweet(sourceword, limit):
     """
     Generates a list of the limit number of tweets ending in the sourceword.
 
@@ -65,7 +65,7 @@ def find_tweets(sourceword, limit):
         if apis_done >= 3:  # if we exhausted all api keys
             print 'All api keys have reach their rate limit. Please try again in 15 minutes.'
             sys.exit(0)
-        return find_tweets(sourceword, limit)
+        return find_tweet(sourceword, limit)
 
     return ""
 
@@ -78,9 +78,9 @@ def beastie_it_up(sourceword, limit):
     i = 0
     while i < limit and i < len(rhymelist):
     	thisword = rhymelist[i]
-        thistweet = find_tweets(thisword, 2)
-    	if thistweet == "":
-    		# make sure we still get 4 lines if it doesn't find a tweet
+        thistweet = find_tweet(thisword, 2)
+    	if thistweet == "":    # if it doesn't find a tweet
+    		# make sure we still get the same number of lines
     		limit += 1
     	else:
             try:
