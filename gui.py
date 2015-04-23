@@ -1,6 +1,6 @@
 from Tkinter import *
 from BeastieAudio import *
-from BeastieBot2 import *
+from BeastieBot import *
 from subproc_combo import *
 
 class BeastieInterface:
@@ -32,13 +32,13 @@ class BeastieInterface:
         #Play Butoon
         self.play = Button(frame,
                          text="Play Rap",
-                         command=self.play)
-        self.play.grid(row=0,column=1, sticky=E)
+                         command=self.play_rap)
+        self.play.grid(row=0,column=1, sticky=NE)
 
         #Text Entry and Label
         self.entry_label = Label(frame,
         	             text="Inspirative Word:")
-        self.entry_label.grid(row=2,column=0)
+        self.entry_label.grid(row=2,column=0, ipady=20, sticky=S)
 
         self.entry = Entry(frame,
                          textvariable=self.word)
@@ -67,12 +67,11 @@ class BeastieInterface:
     def record(self):
         combo_record()
 
-    def play(self):
-    	aplay()
+    def play_rap(self):
+    	play()
         
     def fetch(self):
-        rap = beastie_it_up(self.word.get(), int(self.lines.get()))
-         
+        print beastie_it_up(self.word.get(), int(self.lines.get()))
 
 # class Rap(lines):
 #     lines = lines
