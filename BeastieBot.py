@@ -6,11 +6,15 @@ Created Apr 5, 2015
 @authors Mackenzie Frackleton, Emily Mamula, Robert Siegel, Bill Wong
 """
 from TwitterSearch import *
+from profanity_list import bad_words
+from profanity import profanity
+profanity.load_words(bad_words)
 from countsyl import count_syllables
 import time, urllib2, json, random, sys
 
 apinum = 0
 apis_done = 0
+filter_on = True
 #### PUT apidict HERE ####
 
 def find_rhymes(sourceword):
@@ -74,12 +78,20 @@ def find_tweet(sourceword, timelimit):
             sylcount = count_syllables(thistweet)
 
             # check for ending word
-            if thistweet[-(len(sourceword)):] == sourceword or \
-               thistweet[-(len(sourceword)+1):] == sourceword+'.':
+            if (thistweet[-(len(sourceword)):] == sourceword or
+                thistweet[-(len(sourceword)+1):] == sourceword+'.'):
                 # check syllables, '@' symbols, and links
-                if sylcount <= 10 and sylcount >= 5 and \
-                   '@' not in thistweet and 'http' not in thistweet:
-                    return thistweet
+                if (sylcount <= 10 and sylcount >= 5 and
+                    '@' not in thistweet and 'http' not in thistweet):
+                    # profanity filter
+                    if not filter_on:
+                        return thistweet
+                    # thesewords = thistweet.lower().split()
+                    # if bad_words not in thesewords:
+                    #     return thistweet
+                    if not profanity.contains_profanity(thistweet):
+                        return thistweet
+                    print "PROFANE TWEET:",thistweet
             elapsed = time.time() - start
     except TwitterSearchException:
         apinum = (apinum + 1) % 3
@@ -103,7 +115,7 @@ def beastie_it_up(sourceword, linelimit):
     returns: None
     """
     rhymelist = find_rhymes(sourceword)
-    print rhymelist
+    # print rhymelist
     start = time.time()
     elapsed = 0
 
@@ -117,8 +129,9 @@ def beastie_it_up(sourceword, linelimit):
     	else:
             try:
                 print thistweet
+                #TODO: change this to display on gui
             except UnicodeEncodeError:
                 linelimit += 1 # if there's an emoticon, skip this one
     	i += 1
 
-beastie_it_up('pole', 12)
+# beastie_it_up('pole', 16)
