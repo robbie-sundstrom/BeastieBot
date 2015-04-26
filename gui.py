@@ -1,6 +1,6 @@
 from Tkinter import *
 from BeastieAudio import *
-from BeastieBot import *
+from BeastieBot2 import *
 from subproc_combo import *
 
 class BeastieInterface:
@@ -60,6 +60,9 @@ class BeastieInterface:
         self.return_theme.grid(row=4, column=1, sticky=E)        
         
 
+        self.rap_text = Text(frame)
+        self.rap_text.grid(row = 6)
+
 
     def write_slogan(self):
         print "Welcome to Beastie Bot! Enter an inspirative word and get ready to spit some hot fire."
@@ -71,7 +74,10 @@ class BeastieInterface:
     	play()
         
     def fetch(self):
-        print beastie_it_up(self.word.get(), int(self.lines.get()))
+        self.rap_text.insert(INSERT, beastie_it_up(self.word.get(), int(self.lines.get())))
+
+    def addTweet(self, tweet):
+        self.rap_text.insert(END, tweet)
 
 # class Rap(lines):
 #     lines = lines
