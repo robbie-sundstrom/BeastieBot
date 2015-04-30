@@ -2,7 +2,7 @@ import subprocess, threading, time
 """record and play audio at same time"""
 
 def play():
-	a2='aplay intergallactic.wav'
+	a2='aplay mannythedog.wav'
 	subprocess.call(a2, shell=True)
 
 def record():
