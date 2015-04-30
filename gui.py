@@ -1,9 +1,12 @@
+"""script that pulls together separate working components into user interface. 
+"""
 from Tkinter import *
 from BeastieAudio import *
 from BeastieBot2 import *
 from subproc_combo import *
 
 class BeastieInterface:
+    "Only class, meant to create UI box"
     def __init__(self, master):
         frame = Frame(master)
         frame.pack()
