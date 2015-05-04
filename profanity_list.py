@@ -450,4 +450,8 @@ bad_words = ["4r5e",
 "willies",
 "willy",
 "xrated",
-"xxx"]
+"xxx",
+"negro",
+"negroes",
+"negros",
+"hym"]
