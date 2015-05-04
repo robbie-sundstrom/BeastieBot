@@ -11,8 +11,6 @@ from profanity import profanity
 profanity.load_words(bad_words)
 from countsyl import count_syllables
 from Tkinter import *
-# from BeastieAudio import *
-# from BeastieBot2 import *
 from subproc_combo import *
 import time, urllib2, json, random, sys
 
@@ -117,89 +115,60 @@ class BeastieInterface:
         self.lines = StringVar() #Input Number of Lines
         self.censored = IntVar() 
 
-        #Rap Text
-        self.rap_text = Text(frame)
-        # self.rap_text = Canvas(frame, width=200, height=100)
-        self.rap_text.grid(row = 6, columnspan=4)
-
         #Quit Button
         self.button = Button(frame, 
                          text="QUIT", fg="red",
                          command=frame.quit)
-        self.button.grid(row=0,column=0,sticky=W)
-        
-        # #Welcome Button
-        # self.slogan = Button(frame,
-        #                  text="Welcome",
-        #                  command=self.write_slogan)
-        # self.slogan.grid(row=0,column=1)
-        
-        #Record Button
-        self.audio = Button(frame,
-                         text="Record Rap",
-                         command=self.record)
-        self.audio.grid(row=0,column=3, sticky=E)
-        
-        #Play Butoon
-        self.play = Button(frame,
-                         text="Play Rap",
-                         command=self.play_rap)
-        self.play.grid(row=0,column=2, sticky=E)
+        self.button.grid(row=0,column=2,sticky=E)
 
         #Text Entry and Label
         self.entry_label = Label(frame,
                          text="Inspirative Word:")
-        self.entry_label.grid(row=2,column=0, sticky=W)
+        self.entry_label.grid(row=0,column=0, sticky=W)
 
         self.entry = Entry(frame,
-                         textvariable=self.word)
-        self.entry.grid(row=2,column=1, sticky =W)
+                         textvariable=self.word,
+                         width=10)
+        self.entry.grid(row=0,column=1, sticky =W)
 
         #Number Entry and Label
         self.entry_label = Label(frame,
                          text="Number of Lines:")
-        self.entry_label.grid(row=3,column=0, sticky=W)
+        self.entry_label.grid(row=1,column=0, sticky=W)
 
         self.entry = Entry(frame,
-                         textvariable=self.lines)
-        self.entry.grid(row=3,column=1,sticky=W)
+                         textvariable=self.lines,
+                         width=10)
+        self.entry.grid(row=1,column=1,sticky=W)
 
         #Enter Button 
         self.return_theme = Button(frame,
                          text="Enter",
                          command=self.fetch1)
-        self.return_theme.grid(row=4, column=1, sticky=E)
+        self.return_theme.grid(row=2, column=1, sticky=W)
         
         #Profanity Checkbox
         self.profanity = Checkbutton(frame,
                          text="Clean",
                          variable = self.censored)
-        self.profanity.grid(row=3, column=3, sticky=W)
+        self.profanity.select() # clean by default
+        self.profanity.grid(row=1, column=2, sticky=W)
 
-    def write_slogan(self):
-        print "Welcome to Beastie Bot! Enter an inspirative word and"\
-                "get ready to spit some hot fire."
-
-    def record(self):
-        combo_record()
-
-    def play_rap(self):
-        play()
+        #Rap Text
+        self.rap_text = Text(frame, width=40)
+        self.rap_text.grid(row = 4, columnspan=3)
 
     def fetch1(self):
         rhymelist = find_rhymes(self.word.get())
         self.fetch2(rhymelist, 0, int(self.lines.get()))
 
     def fetch2(self, rhymelist, currentrhyme, linelimit):
-
-        # while i < linelimit and i < len(rhymelist):
-
-        # print 'adding oh yeah'
-        # self.rap_text.insert(END, 'oh yeah\n')
-        # self.rap_text.update_idletasks()
-        # root.after(300, self.fetch2)
-
-        if currentrhyme >= linelimit or currentrhyme >= len(rhymelist):
+        if currentrhyme == 4:
+            combostart()    # start the music and recording
+        if currentrhyme >= len(rhymelist):
+            self.rap_text.insert(END, '.\n.\n.\nNo more rhymes left!\n')
+            return None
+        if currentrhyme >= linelimit:
             self.rap_text.insert(END, '.\n.\n.\nBeastieBot OUT\n')
             return None
 
@@ -209,105 +178,15 @@ class BeastieInterface:
             root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit+1)
         else:
             try:
-                # print thistweet
-                #TODO: change this to display on gui
-                # self.addTweet(thistweet)
                 print 'found tweet'
                 self.rap_text.insert(END, thistweet+'\n')
                 self.rap_text.update_idletasks()
                 root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit)
-            except UnicodeEncodeError:
+            # except UnicodeEncodeError:
+            except TclError:
                 # if there's an emoticon, skip this one
+                print 'Tcl Error man'
                 root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit+1)
-        
-    def fetch(self):
-        # self.rap_text.insert(INSERT, beastie_it_up(self.word.get(), int(self.lines.get())))
-        # self.beastie_it_up(self.word.get(), int(self.lines.get()))
-        # root.after(1000, self.addTweet, 'tweet man')
-        # for i in range(4):
-            # root.after(i*1000, self.addTweet, 'tweet man')
-            # self.rap_text.insert(END, 'poop\n')
-            # time.sleep(1)
-        rhymelist = find_rhymes(self.word.get())
-        linelimit = int(self.lines.get())
-
-        i = 0
-        while i < linelimit and i < len(rhymelist):
-            thistweet = find_tweet(rhymelist[i], 2, self.censored.get())
-            if thistweet == "":    # if it doesn't find a tweet
-                # make sure we still get the same number of lines
-                linelimit += 1
-            else:
-                try:
-                    # print thistweet
-                    #TODO: change this to display on gui
-                    # self.addTweet(thistweet)
-                    print 'found tweet'
-                    root.after(1, self.addTweet, thistweet)
-                    self.rap_text.update_idletasks()
-                except UnicodeEncodeError:
-                    linelimit += 1 # if there's an emoticon, skip this one
-            i += 1
-
-    def addTweet(self, tweet):
-        print 'adding tweet dude'
-        print 'censored:',self.censored.get()
-        self.rap_text.insert(END, tweet+'\n')
-
-    def beastie_it_up_2(self, rhyme):
-        """
-
-        rhymelist: the list of rhymes to iterate through
-        rhymenumber: the index of the current rhyme we're on
-        returns: None
-        """
-        thistweet = find_tweet(rhyme, 2, self.censored.get())
-        if thistweet == "":    # if it doesn't find a tweet
-            # make sure we still get the same number of lines
-            linelimit += 1
-        else:
-            try:
-                # print thistweet
-                #TODO: change this to display on gui
-                # self.addTweet(thistweet)
-                # self.rap_text.update_idletasks()
-                root.after(1, self.addTweet, thistweet)
-            except UnicodeEncodeError:
-                linelimit += 1 # if there's an emoticon, skip this one
-
-
-    def beastie_it_up(self, sourceword, linelimit):
-        """
-        Prints tweets that end in a words that rhyme with the sourceword.
-        Prints each tweet as it finds it. Stops after linelimit tweets, or
-        after there are no more rhymes.
-
-        sourceword: the word to rhyme with
-        linelimit: the maximum number of lines to print
-        returns: None
-        """
-        rhymelist = find_rhymes(sourceword)
-        # print rhymelist
-        start = time.time()
-        elapsed = 0
-
-        i = 0
-        while i < linelimit and i < len(rhymelist):
-            thisword = rhymelist[i]
-            thistweet = find_tweet(thisword, 2, self.censored.get())
-            if thistweet == "":    # if it doesn't find a tweet
-                # make sure we still get the same number of lines
-                linelimit += 1
-            else:
-                try:
-                    # print thistweet
-                    #TODO: change this to display on gui
-                    # self.addTweet(thistweet)
-                    # self.rap_text.update_idletasks()
-                    root.after(1, self.addTweet, thistweet)
-                except UnicodeEncodeError:
-                    linelimit += 1 # if there's an emoticon, skip this one
-            i += 1
 
 root = Tk()
 app = BeastieInterface(root)
