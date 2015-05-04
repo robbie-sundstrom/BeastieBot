@@ -10,17 +10,22 @@ def record():
 	subprocess.call(a1, shell=True)
 
 def combo1():
-	while time.time() <= start_time:
-		pass
+	# while time.time() <= start_time:
+		# pass
 	threading.Thread(target=record).start()
 
 def combo2():
-	while time.time()<=start_time:
-		pass
+	# while time.time()<=start_time:
+		# pass
 	threading.Thread(target=play).start()
-start_time =time.time()+20
-threading.Thread(target=combo1).start()
-threading.Thread(target=combo2).start()
+# start_time =time.time()+20
+
+def combostart():
+	# start_time = time.time()+10
+	# while time.time() < start_time:
+	# 	pass
+	threading.Thread(target=combo1).start()
+	threading.Thread(target=combo2).start()
 
 
 #if __name__ == '__main__':
