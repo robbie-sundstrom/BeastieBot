@@ -6,7 +6,7 @@ def play():
 	subprocess.call(a2, shell=True)
 
 def record():
-	a1="arecord -d 10 rap.wav"
+	a1="arecord -d 120 rap.wav"
 	subprocess.call(a1, shell=True)
 
 def combo1():
