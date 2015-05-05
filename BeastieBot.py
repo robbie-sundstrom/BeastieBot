@@ -16,8 +16,13 @@ import time, urllib2, json, random, sys
 
 apinum = 0
 apis_done = 0
-filter_on = True
-#### PUT apidict HERE ####
+
+#### Paste API Keys Here ####
+apidict = {0: TwitterSearch(
+                consumer_key = 'PASTE HERE',
+                consumer_secret = 'PASTE HERE',
+                access_token = 'PASTE HERE',
+                access_token_secret = 'PASTE HERE')}
 
 def find_rhymes(sourceword):
     """
@@ -58,7 +63,7 @@ def find_tweet(sourceword, timelimit, censored):
     sourceword: word that the tweets should end with
     timelimit: maximum number of seconds to search for
     censored: an integer respresenting whether to censor the tweets that come
-              in or not; 1 means censored and 0 means not censored
+              in; 1 means censored and 0 means not censored
     returns: a string of the tweet, or an empty string if no tweet is
              found
     """
@@ -104,6 +109,7 @@ def find_tweet(sourceword, timelimit, censored):
             sys.exit(0)
         return find_tweet(sourceword, timelimit,censored)
 
+    # if no tweet is found, return a blank string
     return ""
 
 class BeastieInterface:
@@ -121,7 +127,7 @@ class BeastieInterface:
                          command=frame.quit)
         self.button.grid(row=0,column=2,sticky=E)
 
-        #Text Entry and Label
+        #Text Entry
         self.entry_label = Label(frame,
                          text="Inspirative Word:")
         self.entry_label.grid(row=0,column=0, sticky=W)
@@ -131,7 +137,7 @@ class BeastieInterface:
                          width=10)
         self.entry.grid(row=0,column=1, sticky =W)
 
-        #Number Entry and Label
+        #Number of Lines Entry
         self.entry_label = Label(frame,
                          text="Number of Lines:")
         self.entry_label.grid(row=1,column=0, sticky=W)
@@ -144,7 +150,7 @@ class BeastieInterface:
         #Enter Button 
         self.return_theme = Button(frame,
                          text="Enter",
-                         command=self.fetch1)
+                         command=self.start)
         self.return_theme.grid(row=2, column=1, sticky=W)
         
         #Profanity Checkbox
@@ -154,11 +160,11 @@ class BeastieInterface:
         self.profanity.select() # clean by default
         self.profanity.grid(row=1, column=2, sticky=W)
 
-        #Rap Text
+        #Text box where rap shows up
         self.rap_text = Text(frame, width=40)
         self.rap_text.grid(row = 4, columnspan=3)
 
-    def fetch1(self):
+    def start(self):
         rhymelist = find_rhymes(self.word.get())
         self.fetch2(rhymelist, 0, int(self.lines.get()))
 
