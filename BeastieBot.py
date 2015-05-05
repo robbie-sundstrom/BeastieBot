@@ -94,7 +94,6 @@ def find_tweet(sourceword, timelimit, censored):
                     if not profanity.contains_profanity(thistweet):
                         # if there's no profanity, then return thistweet
                         return thistweet
-                    print "PROFANE TWEET:",thistweet
             elapsed = time.time() - start
     except TwitterSearchException:
         print ('All api keys have reach their rate limit. Please try again'
@@ -163,6 +162,7 @@ class BeastieInterface:
     def fetch2(self, rhymelist, currentrhyme, linelimit):
         if currentrhyme == 4:
             combostart()    # start the music and recording
+
         if currentrhyme >= len(rhymelist):
             self.rap_text.insert(END, '.\n.\n.\nNo more rhymes left!\n')
             return None
@@ -180,10 +180,8 @@ class BeastieInterface:
                 self.rap_text.insert(END, thistweet+'\n')
                 self.rap_text.update_idletasks()
                 root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit)
-            # except UnicodeEncodeError:
             except TclError:
-                # if there's an emoticon, skip this one
-                print 'Tcl Error man'
+                # if there's an emoticon, we can't skip this one
                 root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit+1)
 
 root = Tk()
