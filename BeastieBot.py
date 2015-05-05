@@ -157,32 +157,55 @@ class BeastieInterface:
 
     def start(self):
         rhymelist = find_rhymes(self.word.get())
-        self.fetch2(rhymelist, 0, int(self.lines.get()))
+        self.beastie_it_up(rhymelist, 0, int(self.lines.get()))
 
-    def fetch2(self, rhymelist, currentrhyme, linelimit):
+    def beastie_it_up(self, rhymelist, currentrhyme, linelimit):
         if currentrhyme == 4:
-            combostart()    # start the music and recording
-
+            combostart() # Start the music and recording
+ 
+        # If we run out of rhymes:
         if currentrhyme >= len(rhymelist):
             self.rap_text.insert(END, '.\n.\n.\nNo more rhymes left!\n')
             return None
+
+        # If we finish:
         if currentrhyme >= linelimit:
             self.rap_text.insert(END, '.\n.\n.\nBeastieBot OUT\n')
             return None
 
-        thistweet = find_tweet(rhymelist[currentrhyme], 2, self.censored.get())
-        if thistweet == "":    # if it doesn't find a tweet
-            # make sure we still get the same number of lines
-            root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit+1)
+        # Find tweet for the current rhyme, search for 2 seconds
+        thistweet = find_tweet(rhymelist[currentrhyme],2,self.censored.get())
+
+        # If it doesn't find a tweet:
+        if thistweet == "":
+            # Call this function again using the next rhyme,
+            # increase the limit because this rhyme doesn't count
+            root.after(1,
+                       self.beastie_it_up,
+                       rhymelist,
+                       currentrhyme + 1,
+                       linelimit + 1)
         else:
             try:
-                print 'found tweet'
-                self.rap_text.insert(END, thistweet+'\n')
+                # Insert this tweet at the end of the GUI text box
+                # and update it:
+                self.rap_text.insert(END, thistweet + '\n')
                 self.rap_text.update_idletasks()
-                root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit)
+                # Call this function again with the next rhyme:
+                root.after(1,
+                           self.beastie_it_up,
+                           rhymelist,
+                           currentrhyme + 1,
+                           linelimit)
             except TclError:
-                # if there's an emoticon, we can't skip this one
-                root.after(1,self.fetch2,rhymelist,currentrhyme+1,linelimit+1)
+                # If there's an emoticon, we get a TclError, so we have to
+                # skip this rhyme and go to the next one, increasing the
+                # limit because this rhyme doesn't count
+                root.after(1,
+                           self.beastie_it_up,
+                           rhymelist,
+                           currentrhyme + 1,
+                           linelimit + 1)
 
 root = Tk()
 app = BeastieInterface(root)
