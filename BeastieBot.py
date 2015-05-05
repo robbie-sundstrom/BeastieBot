@@ -105,63 +105,86 @@ def find_tweet(sourceword, timelimit, censored):
 
 class BeastieInterface:
     def __init__(self, master):
+        #Create a Tkinter frame
         frame = Frame(master)
         frame.pack()
         
         self.word = StringVar() #Input Word
         self.lines = StringVar() #Input Number of Lines
-        self.censored = IntVar() 
+        self.censored = IntVar() #Input Whether Censored or Not
 
         #Quit Button
         self.button = Button(frame, 
-                         text="QUIT", fg="red",
-                         command=frame.quit)
-        self.button.grid(row=0,column=2,sticky=E)
+                             text="QUIT", fg="red",
+                             command=frame.quit)
+        self.button.grid(row=0, column=2, sticky=E)
 
         #Text Entry
         self.entry_label = Label(frame,
-                         text="Inspirative Word:")
-        self.entry_label.grid(row=0,column=0, sticky=W)
+                                 text="Inspirative Word:")
+        self.entry_label.grid(row=0, column=0, sticky=W)
 
         self.entry = Entry(frame,
-                         textvariable=self.word,
-                         width=10)
-        self.entry.grid(row=0,column=1, sticky =W)
+                           textvariable=self.word,
+                           width=10)
+        self.entry.grid(row=0, column=1, sticky =W)
 
         #Number of Lines Entry
         self.entry_label = Label(frame,
-                         text="Number of Lines:")
-        self.entry_label.grid(row=1,column=0, sticky=W)
+                                 text="Number of Lines:")
+        self.entry_label.grid(row=1, column=0, sticky=W)
 
         self.entry = Entry(frame,
-                         textvariable=self.lines,
-                         width=10)
-        self.entry.grid(row=1,column=1,sticky=W)
+                           textvariable=self.lines,
+                           width=10)
+        self.entry.grid(row=1, column=1, sticky=W)
 
         #Enter Button 
         self.return_theme = Button(frame,
-                         text="Enter",
-                         command=self.start)
+                                   text="Enter",
+                                   command=self.start)
         self.return_theme.grid(row=2, column=1, sticky=W)
         
         #Profanity Checkbox
         self.profanity = Checkbutton(frame,
-                         text="Clean",
-                         variable = self.censored)
-        self.profanity.select() # clean by default
+                                     text="Clean",
+                                     variable = self.censored)
+        self.profanity.select() #Clean by default
         self.profanity.grid(row=1, column=2, sticky=W)
 
         #Text box where rap shows up
         self.rap_text = Text(frame, width=40)
-        self.rap_text.grid(row = 4, columnspan=3)
+        self.rap_text.grid(row=4, columnspan=3)
 
     def start(self):
+        """
+        This is the function called when the user presses the enter button.
+        Gets a list of rhymes, and then calls beastie_it_up with a
+        currentrhyme of 0.
+
+        returns: None
+        """
+        #Find rhymes for the input word:
         rhymelist = find_rhymes(self.word.get())
+        #Beasite up the rhymelist:
         self.beastie_it_up(rhymelist, 0, int(self.lines.get()))
 
     def beastie_it_up(self, rhymelist, currentrhyme, linelimit):
+        """
+        Recursively finds tweets ending in each rhyme in rhymelist, and prints
+        them to the GUI line-by-line as they are found.  Keeps going until it
+        reaches the linelimit, or if there are no more rhymes left.
+
+        rhymelist: the list of rhymes to find tweets from
+        currentrhyme: the index of the rhyme that this function should find
+                      a tweet for, used for recursive purposes
+        linelimit: the total number of lines to print
+        returns: None
+        """
+
+        #Start the music and recording after the 4th rhyme:
         if currentrhyme == 4:
-            combostart() # Start the music and recording
+            combostart()
  
         # If we run out of rhymes:
         if currentrhyme >= len(rhymelist):
@@ -174,7 +197,9 @@ class BeastieInterface:
             return None
 
         # Find tweet for the current rhyme, search for 2 seconds
-        thistweet = find_tweet(rhymelist[currentrhyme],2,self.censored.get())
+        thistweet = find_tweet(rhymelist[currentrhyme],
+                               2,
+                               self.censored.get())
 
         # If it doesn't find a tweet:
         if thistweet == "":
