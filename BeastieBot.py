@@ -14,9 +14,6 @@ from Tkinter import *
 from subproc_combo import *
 import time, urllib2, json, random, sys
 
-apinum = 0
-apis_done = 0
-
 #### Paste API Keys Here ####
 apidict = {0: TwitterSearch(
                 consumer_key = 'PASTE HERE',
@@ -67,13 +64,12 @@ def find_tweet(sourceword, timelimit, censored):
     returns: a string of the tweet, or an empty string if no tweet is
              found
     """
-    global apinum, apis_done
     tso = TwitterSearchOrder() # create a TwitterSearchOrder object
     tso.set_keywords([sourceword]) # word to search for
     tso.set_language('en') # English tweets only
     tso.set_include_entities(False) # don't give us entity information
 
-    ts = apidict[apinum]
+    ts = apidict[0]
 
     start = time.time()
     elapsed = 0
@@ -101,13 +97,9 @@ def find_tweet(sourceword, timelimit, censored):
                     print "PROFANE TWEET:",thistweet
             elapsed = time.time() - start
     except TwitterSearchException:
-        apinum = (apinum + 1) % 3
-        apis_done += 1
-        if apis_done >= 3:  # if we exhausted all api keys
-            print ('All api keys have reach their rate limit. Please '
-                   'try again in 15 minutes.')
-            sys.exit(0)
-        return find_tweet(sourceword, timelimit,censored)
+        print ('All api keys have reach their rate limit. Please try again'
+               'in 15 minutes.')
+        sys.exit(0)
 
     # if no tweet is found, return a blank string
     return ""
